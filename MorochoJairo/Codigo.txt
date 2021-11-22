@@ -1,0 +1,147 @@
+
+	public static boolean Comprobar(double[] respuesta, double[][] ecuacion, double[] solucion, int incognita) {
+		double res = 0;
+		int inicio = 0, confirm;
+		boolean con2 = false;
+		String vista2 = "";
+		String con = "";
+		for (int i = 0; i < incognita; i++) {
+			res = res + (ecuacion[inicio][i] * respuesta[i]);
+			con = con + " (" + (int) ecuacion[inicio][i] + ")x + ";
+
+			vista2 = vista2 + ecuacion[inicio][i] + "(" + String.format("%.2f", respuesta[i]) + ") + ";
+		}
+		con = con.concat("=");
+		con = con.replace("+ =", "=");
+		con = con.concat("" + solucion[inicio]);
+		vista2 = vista2.concat("=");
+		vista2 = vista2.replace("+ =", "=");
+		vista2 = vista2.concat("" + solucion[inicio]);
+		vista2 = vista2 + "\n" + res + " = " + solucion[inicio];
+		JOptionPane.showMessageDialog(null,
+				"Comprobamos con la primera ecuación:\n\t " + con + "\n\t " + vista2 + "   ");
+
+		confirm = JOptionPane.showConfirmDialog(null, "deseas igresar otra ecuacion lineal?");
+		if (confirm == 0) {
+			con2 = true;
+		}
+
+		return con2;
+
+	}
+
+	public static boolean Resolucion(double[][] ecuacion, double[] solucion, int incognita, String vista) {
+		double respuesta[] = new double[incognita];
+		String vistaSolucion = "";
+		int i, j, l, numero,c=0;
+		boolean con = true;
+		double d;
+		int x;
+		for (i = 0; i < incognita; i++) {
+			for (j = i; j < incognita; j++) {
+				if (i == j) {
+					d = ecuacion[i][j];
+					for (l = 0; l < incognita; l++) {
+						ecuacion[i][l] = ((ecuacion[i][l]) / d);
+					}
+					solucion[i] = ((solucion[i]) / d);
+				} else {
+					d = ecuacion[j][i];
+					for (l = 0; l < incognita; l++) {
+						ecuacion[j][l] = ecuacion[j][l] - (d * ecuacion[i][l]);
+					}
+					solucion[j] = solucion[j] - (d * solucion[i]);
+				}
+			}
+		}
+
+		for (i = incognita - 1; i >= 0; i--) {
+			double y = solucion[i];
+			for (j = incognita - 1; j >= i; j--) {
+				y = y - respuesta[j] * ecuacion[i][j];
+			}
+			respuesta[i] = y;
+		}
+       
+		for (i = 0; i < incognita; i++) {
+			if(Double.isNaN(respuesta[i])) {
+				con=false;
+			}else {
+				vistaSolucion = vistaSolucion + "\nEl valor de la incognita Nº " + (i + 1) + " es: "
+						+ String.format("%.2f", respuesta[i]) + "   ";
+			}
+		}
+		if(con) {
+		JOptionPane.showMessageDialog(null, vistaSolucion);
+
+		con = Comprobar(respuesta, ecuacion, solucion, incognita);
+		}else{
+			JOptionPane.showMessageDialog(null,
+					"Por Favor ingrese una ecuacion Válida");
+
+			x= JOptionPane.showConfirmDialog(null, "deseas igresar otra ecuacion lineal?");
+			if (x == 0) {
+				con = true;
+			}
+
+		}    
+		return con;
+	}
+
+	public static void main(String[] args) {
+		int i, j, l, igual, confirm, coeficiente, incognita, numero;
+		double d;
+		double ecuacion[][];
+		double solucion[];
+		double respuesta[];
+		String vistaSolucion = "";
+         String comparar="";
+         String temporal="";
+         
+		boolean seguir = false;
+
+		String vista = "";
+		boolean con = false, confirm2=false;
+		do {
+			vista = "";
+			do {
+				incognita = Integer.parseInt(JOptionPane.showInputDialog("Introduce el numero de incognitas "));
+				ecuacion = new double[incognita][incognita];
+				solucion = new double[incognita];
+				if (incognita >= 3 && incognita <= 10) {
+					for (i = 0; i < incognita; i++) {
+					
+						for (j = 0; j < incognita; j++) {
+							
+							ecuacion[i][j] = Double.parseDouble(
+									JOptionPane.showInputDialog(null, vista + "\n\nIngrese el valor de la ecuación "
+											+ (i + 1) + ", incognita" + (j + 1) + "\t"));
+							vista = vista + " (" + (int) ecuacion[i][j] + ")x +";
+							
+						}
+						vista = vista.concat("= ");
+						vista = vista.replace("+=", "=");
+						solucion[i] = Double.parseDouble(JOptionPane.showInputDialog(null,
+								vista + "\n\nIntroduzca la respuesta de la ecuación " + (i + 1)));
+						vista = vista + (int) solucion[i] + "   <<<<Ecuacion Nº" + (i + 1) + "     \n";
+						
+				     
+					}
+
+					confirm = JOptionPane.showConfirmDialog(null,
+							vista + "La ecuación que ingresaste es correcta?\n\n");
+					if (confirm == 0) {
+						con = true;
+					} else {
+						vista = "";
+					}
+				} else {
+					JOptionPane.showMessageDialog(null,
+							"Recuerde que el valor máximo de incognitas es de 10 y el mínimo es de 3");
+					con=false;
+				}
+			} while (!con);
+			seguir = Resolucion(ecuacion, solucion, incognita, vista);
+			
+			
+		} while (seguir);
