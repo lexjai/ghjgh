@@ -1,0 +1,582 @@
+import javax.swing.*;
+
+public class dulces {
+	private static String[][] golosinas;
+	private static double[][] precios;
+	private static int[][] cantidad;
+	private static double[] monedaValida;
+	private static int[] capacidadMoneda;
+	private static String[] botonesInicio;
+	private static double precio;
+	private static double caja;
+
+	public dulces() {
+		this.golosinas = new String[][] { { "KitKat", "Chicles de fresa", "Lacasitos", "Palotes" },
+				{ "Kinder Bueno", "Bolsa Haribo", "Chetoos", "Twix" },
+				{ "Maiz", "M&M\'S", "Papa Delta", "Chicles de menta" },
+				{ "Gusanitos", "Crunch", "Milkbar", "Patatas fritas" } };
+		this.precios = new double[][] { { 1.10, 0.80, 1.50, 0.90 }, { 1.80, 1.00, 1.20, 1.00 },
+				{ 0.70, 1.30, 1.20, 0.80 }, { 1.50, 1.10, 1.10, 1.10 } };
+		this.cantidad = new int[][] { { 5, 5, 5, 5 }, { 5, 5, 5, 5 }, { 5, 5, 5, 5 }, { 5, 5, 5, 5 } };
+		this.monedaValida = new double[] { 2, 1, 0.50, 0.20, 0.10 };
+		this.capacidadMoneda = new int[] { 10, 10, 10, 10, 10 };
+		this.precio = 0;
+		this.botonesInicio = new String[] { "Elegir", "Mostrar Golosinas" };
+	}
+
+	public String[][] getGolosinas() {
+		return golosinas;
+	}
+
+	public void setGolosinas(String[][] golosinas) {
+		this.golosinas = golosinas;
+	}
+
+	public static double[][] getPrecios() {
+		return precios;
+	}
+
+	public void setPrecios(double[][] precios) {
+		this.precios = precios;
+	}
+
+	public static double getPrecio() {
+		return precio;
+	}
+
+	public void setPrecio(double precio) {
+		this.precio = precio;
+	}
+
+	public static int[][] getCantidad() {
+		return cantidad;
+	}
+
+	public static void setCantidad(int[][] cantidad) {
+		dulces.cantidad = cantidad;
+	}
+
+	public static int[] getCapacidadMoneda() {
+		return capacidadMoneda;
+	}
+
+	public static void setCapacidadMoneda(int[] capacidadMoneda) {
+		dulces.capacidadMoneda = capacidadMoneda;
+	}
+
+	public static double getCaja() {
+		return caja;
+	}
+
+	public static void setCaja(double caja) {
+		dulces.caja = caja;
+	}
+
+	public static boolean verificar(String golosina) {
+		golosina = golosina.replace(" ", "");
+		boolean verificar = false;
+		String posicion = "";
+		if (golosina.length() != 2 || golosina.equals(null) || golosina.equals("")) {
+			verificar = false;
+		} else {
+			for (int i = 0; !verificar && i < golosinas.length; i++) {
+				for (int j = 0; !verificar && j < golosinas[1].length; j++) {
+					posicion = i + "" + j;
+					if (posicion.equals(golosina)) {
+						verificar = true;
+					}
+				}
+			}
+		}
+		return verificar;
+
+	}
+
+	public static String listaGolosinas() {
+		String lista = "";
+		String producto = "";
+		String valor = "";
+		String golosina = "";
+		String valido = "";
+		String pos = "";
+		int ancho = 35;
+		int texto = 0;
+		int tamaño;
+		for (int i = 0; i < golosinas.length; i++) {
+			for (int k = 0; k < precios[1].length; k++) {
+				valor = String.format("%.2f", precios[i][k]) + "€ " + golosinas[i][k];
+				texto = valor.length();
+				tamaño = (ancho / 2) + (texto / 2);
+				String n = String.format("%" + tamaño + "s", valor);
+				lista = lista + String.format("%-" + ancho + "s", n);
+
+			}
+			lista = lista + "\n";
+			for (int p = 0; p < golosinas.length; p++) {
+
+				pos = i + "" + p + "";
+				texto = pos.length();
+				tamaño = ancho - texto;
+				String m = String.format("%-" + tamaño + "s", pos);
+				lista = lista + String.format("%" + 50 + "s", m);
+			}
+			lista = lista + "\n\n\n";
+		}
+		for (int j = 0; j < monedaValida.length; j++) {
+			valido = valido + String.format("%.2f", monedaValida[j]) + "€ / ";
+		}
+		lista = lista + " Monedas validas: " + valido;
+		lista = lista + "\n\n";
+		do {
+			golosina = datoGolosina(lista);
+		} while (!verificar(golosina));
+
+		if (verificar(golosina)) {
+			return elegirGolosina(golosina, lista);
+		} else {
+			return lista;
+		}
+
+	}
+
+	public static String elegirGolosina(String posicion, String lista) {
+		for (int y = 0; y < capacidadMoneda.length; y++) {
+			System.out.println("moneda: " + monedaValida[y] + "capacidad: " + capacidadMoneda[y]);
+
+		}
+
+		String g = "";
+		int row = Integer.parseInt(posicion.charAt(0) + "");
+		int column = Integer.parseInt(posicion.charAt(1) + "");
+		String eleccion = golosinas[row][column];
+//	    String costo= precioGolosina(posicion)+"";
+		String pre = String.format("%.2f", precioGolosina(posicion));
+		if (cantidad[row][column] != 0) {
+
+			g = "\n" + "Disponible: " + cantidad[row][column] + "\n" + golosinas[row][column] + "\t " + pre + "€";
+		} else {
+			JOptionPane.showOptionDialog(null, lista + "\n\n" + golosinas[row][column] + " Agotado", "Maquina Vending",
+					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null/* icono */,
+					new String[] { "Elegir otro producto" }, null);
+
+			return listaGolosinas();
+//			g = "\n" + golosinas[row][column] + " Agotado";
+		}
+		System.out.println(g);
+		double pago = 0;
+		double cant = 0;
+		double[] b = new double[5];
+		int num = 0;
+		int y = 1;
+		boolean l = false;
+		boolean c = false;
+		String h = "";
+		JTextField m = new JTextField();
+
+		do {
+			Object[] cambio = { lista, g, "\n\nCantidad Ingresada: " + String.format("%.2f", cant) + "€",
+					"Ingrese moneda:", m };
+			if (num < 5) {
+				m.setText("");
+				y = JOptionPane.showOptionDialog(null, cambio, "Maquina Vending", JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] { "Ingresar Moneda", "cancelar" },
+						null);
+				h = m.getText().replace(" ", "");
+				if (y == 0) {
+					if (h.equals(null) || h.equals("")) {
+						return elegirGolosina(posicion, lista);
+					}
+					h = h.replace(",", ".");
+					System.out.println("<<<<<" + h);
+					try {
+						Double.parseDouble(h);
+						pago = Double.parseDouble(h);
+					} catch (NumberFormatException e) {
+						JOptionPane.showOptionDialog(null, lista + "\n\n\n Solo se permiten monedas",
+								"Maquina Vending", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
+								null/* icono */, new String[] { "Regresar" }, null);
+						return (elegirGolosina(posicion, lista));
+
+					}
+					if (comprobarMoneda(pago)) {
+						cant = cant + pago;
+						b[num] = pago;
+						System.out.println("+++++++++++++++++++++++++++" + b[num]);
+
+						for (int i = 1; !c && i < monedaValida.length; i++) {
+							System.out.print("moneda:" + monedaValida[i] + "precioo:" + pago);
+							if (monedaValida[i] == pago && capacidadMoneda[i] < 10) {
+								capacidadMoneda[i] = capacidadMoneda[i] + 1;
+								System.out.println(monedaValida[i] + "<<><>>><" + pago + "#####" + capacidadMoneda[i]);
+
+							} else if (monedaValida[0] == pago && capacidadMoneda[i] >= 10) {
+								c = true;
+								cajaAparte(pago);
+							}
+						}
+
+						num++;
+					} else {
+						JOptionPane.showMessageDialog(null, lista + "\n\n" + g + "\n\n Ingrese una moneda valida"
+								+ " \n Moneda devuelta:   " + String.format("%.2f", pago) + " €");
+					}
+				} else if (y != 0 || m.getText().equals(null) || h.equals("")) {
+					JOptionPane.showMessageDialog(null, lista + "\n\n Recoga sus monedas" + " \n Moneda devuelta:   "
+							+ String.format("%.2f", pago) + " €");
+					return listaGolosinas();
+				}
+			} else {
+				l = true;
+
+			}
+
+		} while (cant < precio && !l);
+		if (cant < precio) {
+			JOptionPane.showMessageDialog(null,
+					lista + "\n\n\n la cantidad introdicida no es suficiciente"
+							+ "\n\n Recuerda que la cantidad de monedas a introducir son 5" + " \n Monedas devuelta:   "
+							+ String.format("%.2f", pago) + " €");
+			return listaGolosinas();
+		} else {
+			return cambio(cant, lista, eleccion, b);
+		}
+
+	}
+
+	public static double precioGolosina(String posicion) {
+		int row = Integer.parseInt(posicion.charAt(0) + "");
+		int column = Integer.parseInt(posicion.charAt(1) + "");
+		precio = precios[row][column];
+		double precio = precios[row][column];
+		return precio;
+	}
+
+	public static boolean comprobarMoneda(double moneda) {
+		boolean in = false;
+		int count = 0;
+		double[] cantidad = new double[5];
+		for (int i = 0; in == false && i < monedaValida.length; i++) {
+			if (moneda == monedaValida[i]) {
+				in = true;
+				count++;
+			}
+		}
+
+		return in;
+	}
+
+	public static String cambio(double total, String lista, String eleccion, double[] pago) {
+		System.out.print("<<<" + capacidadMoneda[1]);
+		double change = 0;
+		double suma = 0;
+		double resto = 0;
+		boolean capacidad = false;
+		boolean seguir = true;
+		String moneda = "";
+		String cambio = "";
+		int j = 0;
+		change = total - precio;
+		change = Math.round(change * 100.0) / 100.0;
+		String pre = String.format("%.2f", change);
+		resto = change;
+		System.out.print(" / z<<<<<<<< " + moneda);
+		for (int i = 1; seguir && i < monedaValida.length; i++) {
+			if (monedaValida[i] != change && capacidadMoneda[i] > 0) {
+				while (suma != change && monedaValida[i] < resto) {
+					suma = suma + monedaValida[i];
+					suma = Math.round(suma * 100.0) / 100.0;
+					if (suma > change) {
+						suma = suma - monedaValida[i];
+						resto = change - suma;
+						cambio = " ";
+						System.out.println("asazzz<<<<<<" + capacidadMoneda[i]);
+					} else if (suma <= change) {
+						cambio = String.format("%.2f", monedaValida[i]);
+						capacidadMoneda[i] = capacidadMoneda[i] - 1;
+						System.out.println("asazzz<<<<<<" + capacidadMoneda[i]);
+
+						moneda = moneda + " " + cambio + "€";
+						System.out.print("ZZZZZZZZZZZZZ /  " + moneda);
+					}
+					capacidad = true;
+				}
+			}
+
+			if (monedaValida[i] == change && capacidadMoneda[i] > 0) {
+				seguir = false;
+				cambio = String.format("%.2f", monedaValida[i]);
+				System.out.print(" /----------  " + cambio);
+				moneda = moneda + " " + cambio + "€";
+				capacidadMoneda[i] = capacidadMoneda[i] - 1;
+				capacidad = true;
+				System.out.println(" / zzzzzzzz " + moneda);
+
+			} else if (change == 0) {
+				seguir = false;
+
+				moneda = moneda + "0.00€";
+				capacidadMoneda[i] = capacidadMoneda[i] - 1;
+				capacidad = true;
+				System.out.println(" / zzzzzzzz " + moneda);
+			}
+			if (capacidadMoneda[i] == 0) {
+				capacidad = false;
+			}
+		}
+		System.out.println("--------------------------" + capacidad);
+		if (!capacidad) {
+
+			for (int i = 0; i < monedaValida.length; i++) {
+				System.out.println("moneda:" + monedaValida[i]
+						+ "precioo4444444444444444444444444444444444------------:" + pago[i]);
+				for (int d = 0; d < capacidadMoneda.length; d++) {
+					if (monedaValida[i] == pago[d]) {
+						System.out.println(pago[d] + "moneda:<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+								+ capacidadMoneda[i]);
+						capacidadMoneda[i] -= 1;
+					} else if (pago[d] == 2) {
+						caja = caja - 2;
+					}
+				}
+
+			}
+			System.out
+					.println(pago[2] + "moneda:<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + capacidadMoneda[3]);
+
+			JOptionPane.showOptionDialog(null, lista
+					+ "\n\nMaquina fuera de servicio, sin Cambio \n\n Disculpe las molestias \n\n Total a devolver: "
+					+ String.format("%.2f", total), "Maquina Vending", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] { "Recoger monedas" }, null);
+			return listaGolosinas();
+		}
+		System.out.print(" /  " + moneda);
+		int confirm = 0;
+		do {
+			String t = String.format("%.2f", total) + "€";
+			String p = String.format("%.2f", precio) + "€";
+			confirm = JOptionPane.showOptionDialog(null,
+					lista + "\n\nProducto: " + eleccion + "\n\nPrecio: " + p + "\n\nCantidad Introducia:" + t
+							+ "\n\nCambio: " + pre + "€\n\nMonedas devueltas:" + moneda + "\n\n",
+					"Maquina Vending", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null/* icono */,
+					new String[] { "Recoger producto y cambio" }, null);
+
+		} while (confirm != 0);
+		for (int u = 0; u < golosinas.length; u++) {
+			for (int p = 0; p < golosinas[1].length; p++) {
+				if (golosinas[u][p].equals(eleccion)) {
+					cantidad[u][p] = cantidad[u][p] - 1;
+				}
+
+			}
+		}
+		return listaGolosinas();
+	}
+
+	public static String datoGolosina(String lista) {
+		int y = 0;
+		JTextField producto = new JTextField();
+//		JTextField password = new JPasswordField(5);
+		Object[] productosInicio = { lista, "Eliga una un Producto:", producto, };
+//		Object[] Admin = { "Ingrese Contraseña", password, };
+		int o = JOptionPane.showOptionDialog(null, productosInicio, "Maquina Vending", JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.WARNING_MESSAGE, null/* icono */, botonesInicio, null);
+		if (o != 0) {
+//			y = JOptionPane.showOptionDialog(null, Admin, "Maquina Vending (Admin)", JOptionPane.YES_NO_CANCEL_OPTION,
+//					JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] { "Ingresar", "cancelar" }, null);
+			if (y == 0) {
+//				if (password.getText().equals("1daw3")) {
+				adminMaquina();
+				return "";
+//				} else {
+//					JOptionPane.showMessageDialog(null, "Contraseña incorrecta");
+//					return datoGolosina(lista);
+//				}
+			} else {
+				return datoGolosina(lista);
+			}
+		} else {
+			return producto.getText();
+
+		}
+	}
+
+	public static Double cajaAparte(double moneda) {
+		caja = caja + moneda;
+		return caja;
+
+	}
+
+	public static String adminMaquina() {
+		int y = 0;
+		JTextField password = new JPasswordField(5);
+
+		Object[] Admin = { "Ingrese Contraseña", password, };
+
+		y = JOptionPane.showOptionDialog(null, Admin, "Maquina Vending (Admin/Técnico)", JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] { "Ingresar", "cancelar" }, null);
+		if (y == 0) {
+			if (password.getText().equals("1daw3")) {
+				return vistaAdmin();
+			} else if (password.getText().equals("MaquinaPlaiaundi")) {
+				return vistaTecnico();
+			} else {
+				JOptionPane.showMessageDialog(null, "Contraseña incorrecta");
+				listaGolosinas();
+			}
+		} else {
+			listaGolosinas();
+		}
+		return "";
+	}
+
+	public static String vistaAdmin() {
+		String lista = "";
+		String producto = "";
+		String valor = "";
+		String golosina = "";
+		String valido = "";
+		String pos = "";
+		int ancho = 35;
+		int texto = 0;
+		int tamaño;
+
+		System.out.print("dausgdiaudhiauwdoawidhwad");
+		for (int i = 0; i < golosinas.length; i++) {
+			for (int k = 0; k < precios[1].length; k++) {
+				valor = String.format("%.2f", precios[i][k]) + "€ " + golosinas[i][k];
+				texto = valor.length();
+				tamaño = (ancho / 2) + (texto / 2);
+				String n = String.format("%" + tamaño + "s", valor);
+				lista = lista + String.format("%-" + ancho + "s", n);
+
+			}
+			lista = lista + "\n";
+			for (int p = 0; p < golosinas.length; p++) {
+				pos = "Cantidad: " + cantidad[i][p] + "";
+				texto = pos.length();
+				tamaño = ancho - texto;
+				String m = String.format("%-" + tamaño + "s", pos);
+				lista = lista + String.format("%" + 40 + "s", m);
+			}
+			lista = lista + "\n\n\n";
+		}
+		int o = JOptionPane.showOptionDialog(null, lista, "Maquina Vending (Admin)", JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] { "Salir","Apagar" }, null);
+        if(o==0) {
+		return adminMaquina();
+        }else if(o==1) {
+        	int y = JOptionPane.showOptionDialog(null, "totl vendido: "+caja, "Maquina Vending (Admin)", JOptionPane.YES_NO_CANCEL_OPTION,
+    				JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] { "Cancelar","Apagar" }, null);
+                if(y==1)System.exit(-1);
+                else return vistaAdmin();
+        }
+		return pos;
+       
+	}
+
+	public static String vistaTecnico() {
+		String lista = "";
+		String producto = "";
+		String valor = "";
+		String golosina = "";
+		String valido = "";
+		String pos = "";
+		int ancho = 35;
+		int texto = 0;
+		int tamaño;
+		JTextField cant = new JTextField();
+		JTextField pro = new JTextField();
+
+
+		System.out.print("dausgdiaudhiauwdoawidhwad");
+		for (int i = 0; i < golosinas.length; i++) {
+			for (int k = 0; k < precios[1].length; k++) {
+				valor = String.format("%.2f", precios[i][k]) + "€ " + golosinas[i][k];
+				texto = valor.length();
+				tamaño = (ancho / 2) + (texto / 2);
+				String n = String.format("%" + tamaño + "s", valor);
+				lista = lista + String.format("%-" + ancho + "s", n);
+
+			}
+			lista = lista + "\n";
+			for (int q = 0; q < golosinas.length; q++) {
+				pos = i + "" + q + "";
+				texto = pos.length();
+				tamaño = ancho - texto;
+				String m = String.format("%-" + tamaño + "s", pos);
+				lista = lista + String.format("%" + 50 + "s", m);
+			}
+			lista = lista + "\n";
+			for (int p = 0; p < golosinas.length; p++) {
+				pos = "Cantidad: " + cantidad[i][p] + "";
+				texto = pos.length();
+				tamaño = ancho - texto;
+				String m = String.format("%-" + tamaño + "s", pos);
+				lista = lista + String.format("%" + 40 + "s", m);
+			}
+			lista = lista + "\n\n\n";
+		}
+		Object[] Admin = {lista, "\n\nIngrese posicion del producto: ", pro, "Ingrese Cantidad: ", cant };
+        
+		int o=1;
+        do {
+		 o = JOptionPane.showOptionDialog(null,Admin, "Maquina Vending (Tecnico)", JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] {"Recargar", "Salir" }, null);
+		 if(o==1) {
+			 return listaGolosinas();
+		 }
+		 if(o==0 && pro.getText().length()!=2 || Integer.parseInt(cant.getText())<= 0 &&Integer.parseInt (cant.getText())>5  ) {
+			 JOptionPane.showOptionDialog(null,lista+"ingrese los datos correctos", "Maquina Vending (Tecnico)", JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] {"Aceptar" }, null);
+		 }
+		
+        }while(pro.getText().equals("") || pro.getText().equals("") ||pro.getText().length()!=2); 
+
+		String p= pro.getText();
+        p.replace(" ", "");
+        int row= Integer.parseInt(p.charAt(0)+"");
+        int column =Integer.parseInt(p.charAt(1)+"");
+        int c= Integer.parseInt(cant.getText());
+        if(row<=3 &&row>=0 || column<=3&&column>=0) {
+		if(cantidad[row][column]<5) {       
+		if(o==0) {
+			
+			
+			if(cantidad[row][column]>5) {
+				JOptionPane.showOptionDialog(null,lista +"solo se permite recargar un total de 5 productos", "Maquina Vending (Tecnico)", JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] {"Aceptar" }, null);
+				return vistaTecnico();
+			}else {
+				cantidad[row][column]= cantidad[row][column]+ c;
+				return vistaTecnico();
+			}
+			
+        }else {
+        	return listaGolosinas();
+        }
+		}else {
+			JOptionPane.showOptionDialog(null,lista +"El producto ya tiene la cantidad maxima", "Maquina Vending (Tecnico)", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] {"Aceptar" }, null);
+			return vistaTecnico();
+		}
+        }else {
+			JOptionPane.showOptionDialog(null,lista +"coloque la posición real del producto", "Maquina Vending (Tecnico)", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.WARNING_MESSAGE, null/* icono */, new String[] {"Regresar" }, null);
+			return vistaTecnico();
+		}
+	
+	}
+	public static void main(String[] args) {
+		modelsmaquina nuevo = new modelsmaquina();
+		String golosina="";	
+		nuevo.listaGolosinas();
+
+	}
+      
+}
+
+
+
+
+
+}
